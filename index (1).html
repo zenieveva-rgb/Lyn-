@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Did You Love Me? 🐻</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: linear-gradient(135deg, #ffeef8 0%, #ffe4f0 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Floating hearts background */
+.hearts-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+.heart-float {
+  position: absolute;
+  opacity: 0;
+  animation: float-up 8s ease-in infinite;
+  font-size: 1.5rem;
+}
+@keyframes float-up {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0.5; }
+  100% { transform: translateY(-120vh) rotate(45deg); opacity: 0; }
+}
+
+/* Main card */
+.card {
+  position: relative;
+  z-index: 10;
+  background: white;
+  border-radius: 30px;
+  padding: 50px 40px;
+  max-width: 450px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(255, 100, 150, 0.2);
+  animation: slide-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes slide-in {
+  from { opacity: 0; transform: translateY(50px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Bear container */
+.bear-container {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+.bear {
+  font-size: 120px;
+  line-height: 1;
+  animation: bear-bounce 2s ease-in-out infinite;
+  display: block;
+  filter: drop-shadow(0 10px 20px rgba(255, 100, 150, 0.3));
+}
+@keyframes bear-bounce {
+  0%, 100% { transform: translateY(0) rotate(-5deg); }
+  50% { transform: translateY(-15px) rotate(5deg); }
+}
+.blush {
+  position: absolute;
+  width: 25px;
+  height: 15px;
+  background: rgba(255, 120, 160, 0.5);
+  border-radius: 50%;
+  bottom: 35px;
+  animation: bear-bounce 2s ease-in-out infinite;
+}
+.blush-left { left: 45px; }
+.blush-right { right: 45px; }
+
+/* Title */
+h1 {
+  font-size: 2.5rem;
+  color: #ff1667;
+  margin-bottom: 10px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+.subtitle {
+  color: #c0427b;
+  font-size: 0.95rem;
+  margin-bottom: 30px;
+  opacity: 0.8;
+}
+
+/* Tease message */
+.tease-msg {
+  height: 25px;
+  color: #ff1667;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.tease-msg.visible { opacity: 1; }
+
+/* Buttons container */
+.buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  position: relative;
+  min-height: 60px;
+}
+button {
+  padding: 16px 35px;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-yes {
+  background: linear-gradient(135deg, #ff3377, #ff1667);
+  color: white;
+  box-shadow: 0 8px 20px rgba(255, 22, 103, 0.3);
+}
+.btn-yes:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 30px rgba(255, 22, 103, 0.4);
+}
+.btn-no {
+  background: #ffe8f0;
+  color: #ff1667;
+  box-shadow: 0 4px 15px rgba(255, 100, 150, 0.2);
+}
+
+/* Success view */
+.success-view {
+  display: none;
+}
+.success-view.active {
+  display: block;
+  animation: pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: scale(1); }
+}
+.big-heart {
+  font-size: 100px;
+  display: block;
+  margin-bottom: 15px;
+  animation: heart-pulse 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes heart-pulse {
+  0% { transform: scale(0) rotate(-30deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+.success-view h2 {
+  font-size: 2rem;
+  color: #ff1667;
+  margin-bottom: 10px;
+}
+.success-view p {
+  color: #666;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Confetti */
+.confetti {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  animation: confetti-fall linear forwards;
+}
+@keyframes confetti-fall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- Background hearts -->
+<div class="hearts-bg" id="heartsBg"></div>
+
+<!-- Main card -->
+<div class="card">
+  <!-- Question view -->
+  <div id="questionView">
+    <div class="bear-container">
+      <span class="bear">🐻</span>
+      <span class="blush blush-left"></span>
+      <span class="blush blush-right"></span>
+    </div>
+    
+    <h1>Did You Love Me?</h1>
+    <p class="subtitle">Be honest… the bear already knows 🐾</p>
+    
+    <div class="tease-msg" id="teaseMsg"></div>
+    
+    <div class="buttons" id="buttonsContainer">
+      <button class="btn-yes" id="yesBtn" onclick="handleYes()">Yes 💖</button>
+      <button class="btn-no" id="noBtn" 
+        onmouseover="moveNoButton()" 
+        ontouchstart="moveNoButton(event)">No 🙈</button>
+    </div>
+  </div>
+
+  <!-- Success view -->
+  <div class="success-view" id="successView">
+    <span class="big-heart">💘</span>
+    <h2>I Knew It! 🐻</h2>
+    <p>The bear is doing a happy dance right now…<br>and so is my heart. 💕</p>
+  </div>
+</div>
+
+<script>
+// Background floating hearts
+const heartsContainer = document.getElementById('heartsBg');
+const heartEmojis = ['💗', '💓', '💖', '💝', '💞', '🩷', '❤️', '💟'];
+
+for (let i = 0; i < 25; i++) {
+  const heart = document.createElement('div');
+  heart.className = 'heart-float';
+  heart.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+  heart.style.left = Math.random() * 100 + 'vw';
+  heart.style.bottom = '-50px';
+  heart.style.animationDelay = Math.random() * 8 + 's';
+  heart.style.animationDuration = (5 + Math.random() * 4) + 's';
+  heartsContainer.appendChild(heart);
+}
+
+// No button logic
+let noClickCount = 0;
+const teaseMessages = [
+  "Come on… really? 🥺",
+  "Are you sure?? 💔",
+  "The bear is crying… 😢",
+  "Liar liar! 🙈",
+  "Last chance! 💕",
+  "You can't escape! 🐻",
+  "Just admit it… 💘",
+  "The bear KNOWS 😏"
+];
+
+function moveNoButton(e) {
+  if (e) e.preventDefault();
+  
+  noClickCount++;
+  const noBtn = document.getElementById('noBtn');
+  const container = document.getElementById('buttonsContainer');
+  const yesBtn = document.getElementById('yesBtn');
+  
+  // Position no button randomly
+  container.style.position = 'relative';
+  container.style.minHeight = '120px';
+  noBtn.style.position = 'absolute';
+  
+  const maxX = container.offsetWidth - noBtn.offsetWidth - 10;
+  const maxY = container.offsetHeight - noBtn.offsetHeight - 10;
+  
+  const randomX = Math.max(5, Math.random() * maxX);
+  const randomY = Math.max(5, Math.random() * maxY);
+  
+  noBtn.style.left = randomX + 'px';
+  noBtn.style.top = randomY + 'px';
+  
+  // Show tease message
+  const teaseMsg = document.getElementById('teaseMsg');
+  teaseMsg.textContent = teaseMessages[Math.min(noClickCount - 1, teaseMessages.length - 1)];
+  teaseMsg.classList.add('visible');
+  
+  // Grow yes button
+  const scale = Math.min(1 + noClickCount * 0.1, 1.8);
+  yesBtn.style.transform = `scale(${scale})`;
+}
+
+// Yes button logic
+function handleYes() {
+  document.getElementById('questionView').style.display = 'none';
+  document.getElementById('successView').classList.add('active');
+  createConfetti();
+}
+
+// Confetti
+const confettiColors = ['#ff3377', '#ff1667', '#ffb3d9', '#fff', '#ffd700', '#ff69b4'];
+
+function createConfetti() {
+  for (let i = 0; i < 100; i++) {
+    setTimeout(() => {
+      const confetti = document.createElement('div');
+      confetti.className = 'confetti';
+      
+      const size = 5 + Math.random() * 8;
+      confetti.style.width = size + 'px';
+      confetti.style.height = size + 'px';
+      confetti.style.background = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+      confetti.style.left = Math.random() * 100 + 'vw';
+      confetti.style.top = '0';
+      confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+      confetti.style.animationDuration = (2 + Math.random() * 2) + 's';
+      
+      document.body.appendChild(confetti);
+      
+      setTimeout(() => confetti.remove(), 5000);
+    }, i * 15);
+  }
+}
+</script>
+
+</body>
+</html>
